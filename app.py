@@ -1,7 +1,7 @@
 import os
 import sys
 import logging
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
@@ -33,19 +33,10 @@ def create_app():
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev_key_for_testing')
     
-    # Determine environment
-    is_railway = 'RAILWAY_ENVIRONMENT' in os.environ
-    logger.info(f"Running on Railway: {is_railway}")
-    
-    # Database configuration
-    if is_railway:
-        # For Railway deployment
-        db_path = os.path.join(os.getcwd(), 'waqf.db')
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-        logger.info(f"Using database at: {db_path}")
-    else:
-        # For local development
-        app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///waqf.db')
+    # Database configuration - simplified for Railway
+    db_path = os.path.join(os.getcwd(), 'waqf.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    logger.info(f"Using database at: {db_path}")
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     logger.info(f"Database URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
@@ -109,7 +100,11 @@ def create_app():
     
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        try:
+            return User.query.get(int(user_id))
+        except Exception as e:
+            logger.error(f"Error loading user {user_id}: {str(e)}")
+            return None
     
     # Error handlers
     @app.errorhandler(404)
@@ -125,11 +120,15 @@ def create_app():
     # Make constants available to templates
     @app.context_processor
     def inject_constants():
-        from models import ROLES, PROJECT_STATUS
-        return {
-            'ROLES': ROLES,
-            'PROJECT_STATUS': PROJECT_STATUS
-        }
+        try:
+            from models import ROLES, PROJECT_STATUS
+            return {
+                'ROLES': ROLES,
+                'PROJECT_STATUS': PROJECT_STATUS
+            }
+        except Exception as e:
+            logger.error(f"Error injecting constants: {str(e)}")
+            return {}
     
     # Create database tables
     try:
@@ -144,16 +143,29 @@ def create_app():
     @app.template_filter('file_url')
     def file_url_filter(file_path):
         """Get the appropriate URL for a file based on storage configuration"""
-        if not file_path:
+        try:
+            if not file_path:
+                return url_for('static', filename='images/default.jpg')
+                
+            if app.config['USE_S3']:
+                # Use the S3 URL
+                try:
+                    from utils.s3_storage import get_file_url
+                    return get_file_url(file_path)
+                except Exception as e:
+                    logger.error(f"Error getting S3 URL for {file_path}: {str(e)}")
+                    return url_for('static', filename='images/default.jpg')
+            else:
+                # For local storage, just return the static URL
+                return url_for('static', filename=file_path)
+        except Exception as e:
+            logger.error(f"Error in file_url_filter: {str(e)}")
             return url_for('static', filename='images/default.jpg')
-            
-        if app.config['USE_S3']:
-            # Use the S3 URL
-            from utils.s3_storage import get_file_url
-            return get_file_url(file_path)
-        else:
-            # For local storage, just return the static URL
-            return url_for('static', filename=file_path)
+    
+    # Add a route to test the application
+    @app.route('/healthcheck')
+    def healthcheck():
+        return 'OK', 200
     
     logger.info("Application creation completed successfully")
     return app
