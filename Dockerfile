@@ -21,5 +21,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy all files
 COPY . .
 
-# Run the app
-CMD ["gunicorn", "application:application"]
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+
+# Run the app with gunicorn using PORT environment variable
+CMD gunicorn --bind 0.0.0.0:${PORT:-8080} wsgi:application
