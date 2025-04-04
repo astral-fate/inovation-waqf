@@ -19,17 +19,23 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all files
+# Copy all files including the database
 COPY . .
+
+# Ensure the SQLite database file is writable
+RUN chmod 666 waqf.db
 
 # Make sure directories exist for file uploads
 RUN mkdir -p static/uploads/projects static/uploads/profiles static/images
+RUN chmod -R 777 static/uploads
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=wsgi.py
-ENV DATABASE_URL=sqlite:///waqf.db
 ENV SECRET_KEY=your_secure_key_here
 
-# Run the app with better logging
+# Add the wsgi.py file if not already present (you can adjust the content as needed)
+RUN if [ ! -f wsgi.py ]; then echo 'import os\nimport sys\nimport logging\nfrom app import create_app\n\nlogging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)s] %(message)s", handlers=[logging.StreamHandler(sys.stdout)])\nlogger = logging.getLogger(__name__)\n\ntry:\n    application = create_app()\n    logger.info("Application created successfully")\nexcept Exception as e:\n    logger.error(f"Failed to create application: {str(e)}", exc_info=True)\n    raise\n\nif __name__ == "__main__":\n    try:\n        port = int(os.environ.get("PORT", 8080))\n        logger.info(f"Starting application on port {port}")\n        application.run(host="0.0.0.0", port=port)\n    except Exception as e:\n        logger.error(f"Failed to run application: {str(e)}", exc_info=True)\n        raise' > wsgi.py; fi
+
+# Run the app with better debugging
 CMD gunicorn --log-level debug --workers 1 --threads 8 --timeout 120 --capture-output --enable-stdio-inheritance --bind 0.0.0.0:${PORT:-8000} wsgi:application
