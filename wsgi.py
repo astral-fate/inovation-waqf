@@ -60,7 +60,7 @@ except Exception as e:
 
 if __name__ == "__main__":
     try:
-        port = int(os.environ.get("PORT", 8080))
+        port = int(os.environ.get("PORT", 8000))
         logger.info(f"Starting application on port {port}")
         application.run(host="0.0.0.0", port=port)
     except Exception as e:
