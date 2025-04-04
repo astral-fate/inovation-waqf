@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-# Install system dependencies
+# Install system dependencies for Pillow and SQLite
 RUN apt-get update && apt-get install -y \
     gcc \
     libjpeg-dev \
@@ -22,20 +22,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy all files
 COPY . .
 
-# Ensure the SQLite database file is writable
-RUN chmod 666 waqf.db
-
 # Make sure directories exist for file uploads
 RUN mkdir -p static/uploads/projects static/uploads/profiles static/images
-RUN chmod -R 777 static/uploads
-
-# Make our start script executable
-RUN chmod +x start.sh
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=wsgi.py
-ENV PORT=8080
+ENV DATABASE_URL=sqlite:///waqf.db
+ENV SECRET_KEY=your_secure_key_here
 
-# Use our start script
-CMD ["/app/start.sh"]
+# Run the app with better logging
+CMD gunicorn --log-level debug --workers 1 --threads 8 --timeout 120 --capture-output --enable-stdio-inheritance --bind 0.0.0.0:${PORT:-8000} wsgi:application
