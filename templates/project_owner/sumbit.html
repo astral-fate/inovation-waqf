@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'تعديل المشروع' if is_edit else 'إنشاء مشروع جديد' }} | وقف الابتكار{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">{{ 'تعديل المشروع' if is_edit else 'مشروع ابتكاري جديد' }}</h2>
+                    
+                    <form method="POST" enctype="multipart/form-data" {% if is_edit %}action="{{ url_for('project_owner.edit_project', project_id=project.id) }}"{% else %}action="{{ url_for('project_owner.create_project') }}"{% endif %}>
+                        {{ form.csrf_token }}
+                        
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.category.label(class="form-label") }}
+                            {{ form.category(class="form-select" + (" is-invalid" if form.category.errors else "")) }}
+                            {% if form.category.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.category.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows=5) }}
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">اشرح مشروعك بالتفصيل، وكيف سيتم تنفيذه، والفوائد المتوقعة منه.</div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.funding_goal.label(class="form-label") }}
+                                {{ form.funding_goal(class="form-control" + (" is-invalid" if form.funding_goal.errors else ""), placeholder="مثال: 150000") }}
+                                {% if form.funding_goal.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.funding_goal.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.expected_return.label(class="form-label") }}
+                                {{ form.expected_return(class="form-control" + (" is-invalid" if form.expected_return.errors else ""), placeholder="مثال: ١٥-٢٠٪") }}
+                                {% if form.expected_return.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.expected_return.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.funding_duration.label(class="form-label") }}
+                            {{ form.funding_duration(class="form-select" + (" is-invalid" if form.funding_duration.errors else "")) }}
+                            {% if form.funding_duration.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.funding_duration.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.image.label(class="form-label") }}
+                            {{ form.image(class="form-control" + (" is-invalid" if form.image.errors else "")) }}
+                            {% if form.image.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.image.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">يرجى اختيار صورة بحجم 1200 × 600 بكسل أو مشابه لعرض المشروع بشكل أفضل.</div>
+                            
+                            {% if is_edit and project.image %}
+                                <div class="mt-2">
+                                    <p>الصورة الحالية:</p>
+                                    <img src="{{ url_for('static', filename=project.image) }}" class="img-thumbnail" style="max-height: 200px;">
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-primary btn-lg", value=('حفظ التغييرات' if is_edit else 'إنشاء المشروع')) }}
+                            
+                            {% if is_edit %}
+                                <a href="{{ url_for('project_owner.project_detail', project_id=project.id) }}" class="btn btn-outline-secondary">إلغاء</a>
+                            {% else %}
+                                <a href="{{ url_for('project_owner.dashboard') }}" class="btn btn-outline-secondary">إلغاء</a>
+                            {% endif %}
+                            
+                            {% if is_edit and (project.status == 'draft' or project.status == 'rejected') %}
+                                <button type="button" class="btn btn-success mt-3" onclick="submitForReview()">تقديم المشروع للمراجعة</button>
+                                
+                                <form id="submit-form" action="{{ url_for('project_owner.submit_project', project_id=project.id) }}" method="POST" style="display: none;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                </form>
+                                
+                                <script>
+                                    function submitForReview() {
+                                        if (confirm('هل أنت متأكد من تقديم المشروع للمراجعة؟ لن تتمكن من تعديله بعد ذلك إلا في حال رفضه.')) {
+                                            document.getElementById('submit-form').submit();
+                                        }
+                                    }
+                                </script>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-3">إرشادات هامة قبل تقديم المشروع:</h4>
+                    <ul class="mb-0">
+                        <li class="mb-2">تأكد من توفير وصف دقيق وشامل للمشروع.</li>
+                        <li class="mb-2">حدد المبلغ المطلوب بناءً على دراسة مالية واقعية.</li>
+                        <li class="mb-2">وضّح نسبة العائد المتوقع بشكل منطقي.</li>
+                        <li class="mb-2">استخدم صورة واضحة وجذابة لمشروعك.</li>
+                        <li class="mb-2">ستتم مراجعة المشروع من قبل فريق المنصة قبل نشره للتمويل.</li>
+                        <li>يمكنك حفظ المشروع كمسودة والعودة لاستكماله لاحقاً قبل تقديمه للمراجعة.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

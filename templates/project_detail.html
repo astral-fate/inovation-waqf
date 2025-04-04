@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }} | وقف الابتكار{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Project Details -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="project-header mb-4">
+                        {% if project.image %}
+                            <img src="{{ url_for('static', filename=project.image) }}" class="img-fluid rounded mb-3" alt="{{ project.title }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/default_project.jpg') }}" class="img-fluid rounded mb-3" alt="{{ project.title }}">
+                        {% endif %}
+                        
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="project-status 
+                                {% if project.status == 'funding' %}status-funding
+                                {% elif project.status == 'funded' %}status-funded
+                                {% elif project.status == 'completed' %}status-completed
+                                {% endif %}">
+                                {% if project.status == 'funding' %}قيد التمويل
+                                {% elif project.status == 'funded' %}مكتمل التمويل
+                                {% elif project.status == 'completed' %}مكتمل
+                                {% endif %}
+                            </div>
+                            
+                            {% if project.category == 'tech' %}
+                                <span class="project-category">تقني</span>
+                            {% elif project.category == 'medical' %}
+                                <span class="project-category">طبي</span>
+                            {% elif project.category == 'industrial' %}
+                                <span class="project-category">صناعي</span>
+                            {% elif project.category == 'agricultural' %}
+                                <span class="project-category">زراعي</span>
+                            {% elif project.category == 'educational' %}
+                                <span class="project-category">تعليمي</span>
+                            {% elif project.category == 'environmental' %}
+                                <span class="project-category">بيئي</span>
+                            {% elif project.category == 'energy' %}
+                                <span class="project-category">طاقة</span>
+                            {% else %}
+                                <span class="project-category">أخرى</span>
+                            {% endif %}
+                        </div>
+                        
+                        <h2 class="mt-3">{{ project.title }}</h2>
+                        
+                        <!-- Project Owner -->
+                        <div class="d-flex align-items-center mt-3">
+                            {% if project.owner.profile_image %}
+                                <img src="{{ url_for('static', filename=project.owner.profile_image) }}" class="rounded-circle me-2" width="40" height="40" alt="{{ project.owner.full_name }}">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/default_profile.jpg') }}" class="rounded-circle me-2" width="40" height="40" alt="{{ project.owner.full_name }}">
+                            {% endif %}
+                            <div>
+                                <span class="fw-bold">{{ project.owner.full_name }}</span>
+                                <span class="text-muted d-block small">صاحب المشروع</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Funding Progress -->
+                    {% if project.status in ['funding', 'funded', 'completed'] %}
+                        <div class="project-progress mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <div>
+                                    <span class="fs-5 fw-bold">{{ project.current_funding|format_currency }}</span>
+                                    <span class="text-muted"> من {{ project.funding_goal|format_currency }}</span>
+                                </div>
+                                <span class="fw-bold">{{ project.funding_progress|format_percentage }}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: {{ project.funding_progress }}%"></div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-2">
+                                {% if project.status == 'funding' %}
+                                    <span class="text-muted">{{ project.days_remaining()|format_days }}</span>
+                                {% else %}
+                                    <span class="text-muted">اكتمل التمويل</span>
+                                {% endif %}
+                                
+                                <span class="text-muted">{{ project.fundings|length }} داعم</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Support Button -->
+                        {% if project.status == 'funding' and current_user.is_authenticated and current_user.is_funder() %}
+                            <div class="text-center mb-4">
+                                <a href="{{ url_for('funder.fund_project', project_id=project.id) }}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-hand-holding-usd me-2"></i>ادعم المشروع
+                                </a>
+                            </div>
+                        {% endif %}
+                        
+                        {% if not current_user.is_authenticated %}
+                            <div class="text-center mb-4">
+                                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sign-in-alt me-2"></i>سجل الدخول للدعم
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    <div class="project-details mb-4">
+                        <h5>وصف المشروع</h5>
+                        <p class="text-justify">{{ project.description|nl2br|safe }}</p>
+                    </div>
+                    
+                    <div class="row project-numbers mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <h5>الهدف التمويلي</h5>
+                                    <p class="h3 text-primary mb-0">{{ project.funding_goal|format_currency }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <h5>العائد المتوقع</h5>
+                                    <p class="h3 text-accent mb-0">{{ project.expected_return }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Project Updates -->
+            {% if project.updates %}
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h3 class="mb-0">تحديثات المشروع</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            {% for update in project.updates %}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker 
+                                        {% if update.update_type == 'milestone' %}bg-primary
+                                        {% elif update.update_type == 'progress' %}bg-success
+                                        {% elif update.update_type == 'financial' %}bg-warning
+                                        {% else %}bg-secondary
+                                        {% endif %}">
+                                        {% if update.update_type == 'milestone' %}
+                                            <i class="fas fa-flag-checkered"></i>
+                                        {% elif update.update_type == 'progress' %}
+                                            <i class="fas fa-tasks"></i>
+                                        {% elif update.update_type == 'financial' %}
+                                            <i class="fas fa-money-bill-wave"></i>
+                                        {% else %}
+                                            <i class="fas fa-info-circle"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="timeline-content">
+                                        <div class="d-flex justify-content-between">
+                                            <h5>{{ update.title }}</h5>
+                                            <span class="text-muted small">{{ update.date.strftime('%Y-%m-%d') }}</span>
+                                        </div>
+                                        <p>{{ update.content }}</p>
+                                        
+                                        <div class="update-type">
+                                            {% if update.update_type == 'milestone' %}
+                                                <span class="badge bg-primary">إنجاز مرحلة</span>
+                                            {% elif update.update_type == 'progress' %}
+                                                <span class="badge bg-success">تقرير تقدم</span>
+                                            {% elif update.update_type == 'financial' %}
+                                                <span class="badge bg-warning">تحديث مالي</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">آخر</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Actions -->
+            {% if current_user.is_authenticated and current_user.is_funder() %}
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h5 class="mb-0">إجراءات سريعة</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-3">
+                            {% if project.status == 'funding' %}
+                                <a href="{{ url_for('funder.fund_project', project_id=project.id) }}" class="btn btn-primary">
+                                    <i class="fas fa-hand-holding-usd me-2"></i>ادعم المشروع
+                                </a>
+                            {% endif %}
+                            
+                            <!-- Add to Watchlist -->
+                            <form action="{{ url_for('funder.add_to_watchlist', project_id=project.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-bookmark me-2"></i>إضافة للمتابعة
+                                </button>
+                            </form>
+                            
+                            <a href="{{ url_for('funder.dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-tachometer-alt me-2"></i>لوحة التحكم
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Project Details -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h5 class="mb-0">تفاصيل المشروع</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% if project.funding_start_date %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>تاريخ بدء التمويل</span>
+                                <span>{{ project.funding_start_date.strftime('%Y-%m-%d') }}</span>
+                            </li>
+                        {% endif %}
+                        
+                        {% if project.funding_end_date %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>تاريخ انتهاء التمويل</span>
+                                <span>{{ project.funding_end_date.strftime('%Y-%m-%d') }}</span>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>فئة المشروع</span>
+                            <span>
+                                {% if project.category == 'tech' %}
+                                    تقني
+                                {% elif project.category == 'medical' %}
+                                    طبي
+                                {% elif project.category == 'industrial' %}
+                                    صناعي
+                                {% elif project.category == 'agricultural' %}
+                                    زراعي
+                                {% elif project.category == 'educational' %}
+                                    تعليمي
+                                {% elif project.category == 'environmental' %}
+                                    بيئي
+                                {% elif project.category == 'energy' %}
+                                    طاقة
+                                {% else %}
+                                    أخرى
+                                {% endif %}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Share Project -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h5 class="mb-0">مشاركة المشروع</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-around">
+                        <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ project.title }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://wa.me/?text={{ project.title }}%20{{ request.url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://t.me/share/url?url={{ request.url }}&text={{ project.title }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-telegram-plane"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Similar Projects -->
+            {% if similar_projects %}
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h5 class="mb-0">مشاريع مشابهة</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for similar in similar_projects %}
+                            <div class="d-flex align-items-center mb-3">
+                                {% if similar.image %}
+                                    <img src="{{ url_for('static', filename=similar.image) }}" class="rounded me-2" width="60" height="60" style="object-fit: cover;" alt="{{ similar.title }}">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='images/default_project.jpg') }}" class="rounded me-2" width="60" height="60" alt="{{ similar.title }}">
+                                {% endif %}
+                                <div>
+                                    <a href="{{ url_for('main.project_detail', project_id=similar.id) }}" class="text-decoration-none">
+                                        <h6 class="mb-0">{{ similar.title }}</h6>
+                                    </a>
+                                    <div class="progress-bar mt-1" style="height: 5px; width: 100px;">
+                                        <div class="progress" style="width: {{ similar.funding_progress }}%"></div>
+                                    </div>
+                                    <small class="text-muted">{{ similar.funding_progress|format_percentage }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 1.5rem;
+    }
+    
+    .timeline:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 7px;
+        bottom: 0;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        top: 0;
+        left: -1.5rem;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 8px;
+    }
+    
+    .timeline-content {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+    }
+</style>
+{% endblock %}

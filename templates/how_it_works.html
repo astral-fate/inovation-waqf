@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+
+{% block title %}كيف نعمل | وقف الابتكار{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5 position-relative">
+        كيف يعمل وقف الابتكار
+        <span class="position-absolute start-50 translate-middle-x" style="bottom: -15px; width: 70px; height: 3px; background-color: var(--primary);"></span>
+    </h1>
+
+    <!-- Introduction Section -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="card shadow border-0">
+                <div class="card-body p-4 text-center">
+                    <h2 class="mb-4">منصة وقف الابتكار</h2>
+                    <p class="lead">منصة رقمية وطنية مبتكرة للتمويل الجماعي الوقفي، تعنى بدعم الأبحاث والابتكارات المستدامة في مختلف القطاعات الحيوية. تجمع المنصة بين الباحثين والمبتكرين من جهة، والداعمين من أفراد ومؤسسات من جهة أخرى، من خلال نموذج تمويلي شفاف، ومستدام، متوافق مع الشريعة الإسلامية.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Steps -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center py-4">
+                    <div class="rounded-circle bg-light mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-lightbulb text-primary fa-2x"></i>
+                    </div>
+                    <h4>1. تقديم المشروع</h4>
+                    <p class="text-muted">يقوم الباحثون والمبتكرون بتقديم مشاريعهم عبر المنصة مع تفاصيل المشروع، الميزانية المطلوبة، والعوائد المتوقعة.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center py-4">
+                    <div class="rounded-circle bg-light mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-clipboard-check text-primary fa-2x"></i>
+                    </div>
+                    <h4>2. التحقق والمراجعة</h4>
+                    <p class="text-muted">تخضع جميع المشاريع لعملية تحقق دقيقة بالتعاون مع شركائنا المتخصصين لضمان الجودة والمصداقية قبل عرضها.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center py-4">
+                    <div class="rounded-circle bg-light mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-hand-holding-usd text-primary fa-2x"></i>
+                    </div>
+                    <h4>3. التمويل الجماعي</h4>
+                    <p class="text-muted">يمكن للداعمين من أفراد ومؤسسات المساهمة في تمويل المشاريع التي تهمهم، سواء كتبرع مباشر أو استثمار موجه بعائد محتمل.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center py-4">
+                    <div class="rounded-circle bg-light mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-chart-line text-primary fa-2x"></i>
+                    </div>
+                    <h4>4. التنفيذ والمتابعة</h4>
+                    <p class="text-muted">بعد اكتمال التمويل، يبدأ أصحاب المشاريع بالتنفيذ مع نشر تحديثات دورية للداعمين وتوزيع العوائد المحتملة.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Process -->
+    <div class="row mb-5">
+        <div class="col-lg-12">
+            <h2 class="text-center mb-4">عملية التمويل بالتفصيل</h2>
+            
+            <div class="timeline-section">
+                <!-- For Project Owners -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">لأصحاب المشاريع (الباحثين والمبتكرين)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>التسجيل وإنشاء حساب</h4>
+                                    <p>سجل كصاحب مشروع في المنصة وأكمل بياناتك الشخصية والمهنية.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>تقديم المشروع</h4>
+                                    <p>أنشئ مشروعك مع تفاصيل كاملة تشمل الوصف، الميزانية المطلوبة، الجدول الزمني، والعوائد المتوقعة.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>عملية التحقق</h4>
+                                    <p>يخضع مشروعك لمراجعة شاملة من قبل فريقنا وشركائنا المتخصصين للتأكد من جدواه ومصداقيته.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary">
+                                    <i class="fas fa-bullhorn"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>عرض المشروع للتمويل</h4>
+                                    <p>بعد الموافقة، يتم عرض مشروعك على المنصة ليتمكن الداعمون من الاطلاع عليه والمساهمة في تمويله.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary">
+                                    <i class="fas fa-tasks"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>التنفيذ والتحديثات</h4>
+                                    <p>بعد اكتمال التمويل، ابدأ في تنفيذ المشروع مع تقديم تحديثات دورية للداعمين عبر المنصة.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>توزيع العوائد</h4>
+                                    <p>عند تحقيق إيرادات من المشروع، يتم توزيع العوائد على الداعمين وفق النسب المتفق عليها مسبقاً.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- For Funders -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-secondary text-white">
+                        <h3 class="mb-0">للداعمين (أفراد ومؤسسات)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-secondary">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>التسجيل كداعم</h4>
+                                    <p>أنشئ حسابك كداعم على المنصة ليمكنك الوصول إلى المشاريع المعروضة.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-secondary">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>استكشاف المشاريع</h4>
+                                    <p>تصفح المشاريع المتاحة للتمويل وتعرف على تفاصيلها وتوقعاتها.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-secondary">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>دعم المشروع</h4>
+                                    <p>اختر المشروع الذي ترغب في دعمه وحدد مبلغ المساهمة وطريقة التمويل (تبرع أو استثمار).</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-secondary">
+                                    <i class="fas fa-bell"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>متابعة التقدم</h4>
+                                    <p>تلقى تحديثات دورية عن تقدم المشروع وسير العمل فيه عبر لوحة تحكم المستخدم.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-secondary">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>استلام العوائد</h4>
+                                    <p>في حالة المشاريع الاستثمارية، استلم حصتك من عوائد المشروع وفق النموذج المحدد.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Benefits -->
+    <div class="row mb-5">
+        <div class="col-lg-12">
+            <h2 class="text-center mb-4">مميزات منصة وقف الابتكار</h2>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h4><i class="fas fa-shield-alt text-primary me-2"></i> تحقق وموثوقية</h4>
+                            <p>عملية تحقق دقيقة للمشاريع بالتعاون مع خبراء متخصصين وشركاء موثوقين.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h4><i class="fas fa-mosque text-primary me-2"></i> متوافق مع الشريعة</h4>
+                            <p>نموذج تمويلي متوافق بالكامل مع أحكام الشريعة الإسلامية ومبادئ الوقف.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h4><i class="fas fa-seedling text-primary me-2"></i> تمويل مستدام</h4>
+                            <p>نموذج يدعم المشاريع التي تحتاج تمويلاً مستداماً أو متكرراً لمراحل البحث والتطوير.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h4><i class="fas fa-chart-line text-primary me-2"></i> عوائد استثمارية</h4>
+                            <p>إمكانية تحقيق عوائد للمساهمين من خلال نموذج استثماري مبتكر للمشاريع ذات الجدوى التجارية.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h4><i class="fas fa-tachometer-alt text-primary me-2"></i> لوحات تحكم متقدمة</h4>
+                            <p>أدوات متقدمة لإدارة ومتابعة المشاريع والتمويل، مع تقارير تفصيلية للمساهمين وأصحاب المشاريع.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h4><i class="fas fa-handshake text-primary me-2"></i> دعم الابتكار الوطني</h4>
+                            <p>المساهمة في تحقيق رؤية 2030 عبر سد الفجوة التمويلية في قطاع البحث والابتكار وتعزيز الاقتصاد المعرفي.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card bg-primary text-white shadow border-0">
+                <div class="card-body p-5 text-center">
+                    <h2 class="mb-3">شارك في تمكين الابتكار السعودي</h2>
+                    <p class="lead mb-4">انضم إلى منصة وقف الابتكار اليوم وكن جزءاً من مستقبل الاقتصاد المعرفي في المملكة.</p>
+                    <div class="d-flex justify-content-center flex-wrap gap-3">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">سجل كمبتكر</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg">سجل كداعم</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 50px;
+    }
+    
+    .timeline:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 7px;
+        bottom: 0;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        top: 0;
+        left: -1.5rem;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 8px;
+    }
+    
+    .timeline-content {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}

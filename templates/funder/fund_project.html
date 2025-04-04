@@ -1,0 +1,186 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}دعم المشروع | وقف الابتكار{% endblock %}
+
+{% block sidebar_menu %}
+<ul class="sidebar-menu">
+    <li class="menu-item">
+        <a href="{{ url_for('funder.dashboard') }}">
+            <i class="fas fa-tachometer-alt"></i>
+            لوحة البيانات
+        </a>
+    </li>
+    <li class="menu-item">
+        <a href="{{ url_for('funder.my_contributions') }}">
+            <i class="fas fa-folder"></i>
+            مساهماتي
+        </a>
+    </li>
+    <li class="menu-item">
+        <a href="{{ url_for('funder.watchlist') }}">
+            <i class="fas fa-bookmark"></i>
+            قائمة المتابعة
+        </a>
+    </li>
+    <li class="menu-item">
+        <a href="{{ url_for('funder.explore') }}">
+            <i class="fas fa-search"></i>
+            استكشاف المشاريع
+        </a>
+    </li>
+    <li class="menu-item">
+        <a href="{{ url_for('funder.profile') }}">
+            <i class="fas fa-user-cog"></i>
+            الملف الشخصي
+        </a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-header">
+    <ul class="breadcrumb">
+        <li><a href="{{ url_for('funder.dashboard') }}">لوحة البيانات</a></li>
+        <li><a href="{{ url_for('main.project_detail', project_id=project.id) }}">{{ project.title }}</a></li>
+        <li>دعم المشروع</li>
+    </ul>
+    <h1 class="page-title">دعم المشروع</h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">{{ project.title }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-4">
+                    {% if project.image %}
+                        <img src="{{ url_for('static', filename=project.image) }}" class="rounded me-3" width="100" height="100" style="object-fit: cover;" alt="{{ project.title }}">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='images/default_project.jpg') }}" class="rounded me-3" width="100" height="100" alt="{{ project.title }}">
+                    {% endif %}
+                    <div>
+                        <div class="project-status status-funding mb-2">قيد التمويل</div>
+                        <p class="mb-1"><strong>صاحب المشروع:</strong> {{ project.owner.full_name }}</p>
+                        <p class="mb-0"><strong>العائد المتوقع:</strong> {{ project.expected_return }}</p>
+                    </div>
+                </div>
+                
+                <div class="progress-bar mb-2">
+                    <div class="progress" style="width: {{ project.funding_progress }}%"></div>
+                </div>
+                <div class="d-flex justify-content-between mb-4">
+                    <div>
+                        <span class="text-muted">تم جمع:</span>
+                        <span class="fw-bold">{{ project.current_funding|format_currency }}</span>
+                        <span class="text-muted">من {{ project.funding_goal|format_currency }}</span>
+                    </div>
+                    <div>
+                        <span class="fw-bold">{{ project.funding_progress|format_percentage }}</span>
+                    </div>
+                </div>
+                
+                <form method="POST" action="{{ url_for('funder.fund_project', project_id=project.id) }}">
+                    {{ form.csrf_token }}
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.amount.id }}" class="form-label">مبلغ التمويل (ريال)</label>
+                        {{ form.amount(class="form-control form-control-lg" + (" is-invalid" if form.amount.errors else ""), placeholder="أدخل المبلغ") }}
+                        {% if form.amount.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.amount.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">الحد الأدنى للتمويل هو 100 ريال</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check">
+                            {{ form.agree_terms(class="form-check-input" + (" is-invalid" if form.agree_terms.errors else "")) }}
+                            <label class="form-check-label" for="{{ form.agree_terms.id }}">
+                                أوافق على <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">الشروط والأحكام</a>
+                            </label>
+                            {% if form.agree_terms.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.agree_terms.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary btn-lg">تأكيد الدعم</button>
+                        <a href="{{ url_for('main.project_detail', project_id=project.id) }}" class="btn btn-outline-secondary btn-lg">إلغاء</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">معلومات هامة</h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h5>العائد المتوقع</h5>
+                    <p>العائد المتوقع من هذا المشروع هو {{ project.expected_return }} على استثمارك.</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h5>المدة المتوقعة</h5>
+                    <p>المدة المتوقعة لبدء الحصول على العوائد هي 6-12 شهر من تاريخ اكتمال التمويل.</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h5>آلية التمويل</h5>
+                    <p>عند اكتمال التمويل، سيتم إرسال الأموال إلى صاحب المشروع وستتلقى تحديثات دورية عن تقدم المشروع.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms and Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">الشروط والأحكام</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h5>شروط التمويل</h5>
+                <p>بتمويلك لهذا المشروع، أنت توافق على الشروط والأحكام التالية:</p>
+                <ol>
+                    <li>يعتبر مبلغ التمويل استثماراً في المشروع وليس تبرعاً.</li>
+                    <li>ستحصل على عائد متوقع كما هو محدد في وصف المشروع، ولكن هذا العائد غير مضمون وقد يختلف بناءً على أداء المشروع.</li>
+                    <li>إذا لم يتم تحقيق هدف التمويل المطلوب خلال الفترة المحددة، سيتم إرجاع مبلغ التمويل بالكامل إلى حسابك.</li>
+                    <li>ستتلقى تحديثات دورية عن سير المشروع ومراحل تنفيذه.</li>
+                    <li>تحتفظ منصة وقف الابتكار بحق إلغاء أي مشروع في حال عدم الالتزام بالشروط أو في حال وجود مخالفات.</li>
+                </ol>
+                
+                <h5>المخاطر</h5>
+                <p>يجب أن تكون على دراية بالمخاطر التالية:</p>
+                <ul>
+                    <li>قد لا يحقق المشروع العائد المتوقع بالضبط.</li>
+                    <li>قد تواجه المشاريع تأخيرات في التنفيذ أو التشغيل.</li>
+                    <li>في الحالات النادرة، قد يفشل المشروع في تحقيق أهدافه.</li>
+                </ul>
+                
+                <h5>إخلاء المسؤولية</h5>
+                <p>تقوم منصة وقف الابتكار بمراجعة المشاريع والتحقق منها، ولكنها لا تضمن نجاحها أو تحقيقها للعوائد المتوقعة. يجب على المستثمرين أخذ قراراتهم الاستثمارية بناءً على تقييمهم الخاص.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">موافق</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

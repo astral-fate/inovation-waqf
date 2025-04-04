@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}تسجيل الدخول | وقف الابتكار{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="auth-form">
+        <h2 class="text-center mb-4">تسجيل الدخول</h2>
+        
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            {{ form.csrf_token }}
+            
+            <div class="mb-3">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                {% if form.email.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.email.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else "")) }}
+                {% if form.password.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.password.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3 form-check">
+                {{ form.remember_me(class="form-check-input") }}
+                {{ form.remember_me.label(class="form-check-label") }}
+            </div>
+            
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">تسجيل الدخول</button>
+            </div>
+        </form>
+        
+        <div class="text-center mt-3">
+            <p>ليس لديك حساب؟ <a href="{{ url_for('auth.register') }}">تسجيل حساب جديد</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

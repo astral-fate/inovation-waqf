@@ -1,0 +1,155 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}استكشاف المشاريع | وقف الابتكار{% endblock %}
+
+{% block sidebar_menu %}
+<ul class="sidebar-menu">
+    <li class="menu-item">
+        <a href="{{ url_for('funder.dashboard') }}">
+            <i class="fas fa-tachometer-alt"></i>
+            لوحة البيانات
+        </a>
+    </li>
+    <li class="menu-item">
+        <a href="{{ url_for('funder.my_contributions') }}">
+            <i class="fas fa-folder"></i>
+            مساهماتي
+        </a>
+    </li>
+    <li class="menu-item">
+        <a href="{{ url_for('funder.watchlist') }}">
+            <i class="fas fa-bookmark"></i>
+            قائمة المتابعة
+        </a>
+    </li>
+    <li class="menu-item active">
+        <a href="{{ url_for('funder.explore') }}">
+            <i class="fas fa-search"></i>
+            استكشاف المشاريع
+        </a>
+    </li>
+    <li class="menu-item">
+        <a href="{{ url_for('funder.profile') }}">
+            <i class="fas fa-user-cog"></i>
+            الملف الشخصي
+        </a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-header">
+    <ul class="breadcrumb">
+        <li><a href="{{ url_for('funder.dashboard') }}">لوحة البيانات</a></li>
+        <li>استكشاف المشاريع</li>
+    </ul>
+    <h1 class="page-title">استكشاف المشاريع</h1>
+</div>
+
+<!-- Filter Options -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('funder.explore') }}" class="row g-3">
+            <div class="col-md-5">
+                <label class="form-label">فئة المشروع</label>
+                <select name="category" class="form-select">
+                    <option value="all" {% if category == 'all' %}selected{% endif %}>جميع الفئات</option>
+                    <option value="tech" {% if category == 'tech' %}selected{% endif %}>تقني</option>
+                    <option value="medical" {% if category == 'medical' %}selected{% endif %}>طبي</option>
+                    <option value="industrial" {% if category == 'industrial' %}selected{% endif %}>صناعي</option>
+                    <option value="agricultural" {% if category == 'agricultural' %}selected{% endif %}>زراعي</option>
+                    <option value="educational" {% if category == 'educational' %}selected{% endif %}>تعليمي</option>
+                    <option value="environmental" {% if category == 'environmental' %}selected{% endif %}>بيئي</option>
+                    <option value="energy" {% if category == 'energy' %}selected{% endif %}>طاقة</option>
+                    <option value="other" {% if category == 'other' %}selected{% endif %}>أخرى</option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">ترتيب حسب</label>
+                <select name="sort_by" class="form-select">
+                    <option value="progress" {% if sort_by == 'progress' %}selected{% endif %}>نسبة التمويل</option>
+                    <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>الأحدث</option>
+                    <option value="ending_soon" {% if sort_by == 'ending_soon' %}selected{% endif %}>وشك الانتهاء</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">تطبيق</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Projects Grid -->
+{% if projects %}
+    <div class="contributions-grid">
+        {% for project in projects %}
+            <div class="contribution-card">
+                {% if project.image %}
+                    <img src="{{ url_for('static', filename=project.image) }}" class="project-img" alt="{{ project.title }}">
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/default_project.jpg') }}" class="project-img" alt="{{ project.title }}">
+                {% endif %}
+                <div class="contribution-content">
+                    <div class="project-status status-funding">قيد التمويل</div>
+                    <h3 class="project-title">{{ project.title }}</h3>
+                    <div class="contribution-detail">
+                        <span class="contribution-label">صاحب المشروع:</span>
+                        <span>{{ project.owner.full_name }}</span>
+                    </div>
+                    <div class="contribution-detail">
+                        <span class="contribution-label">الهدف:</span>
+                        <span>{{ project.funding_goal|format_currency }}</span>
+                    </div>
+                    <div class="contribution-detail">
+                        <span class="contribution-label">تم جمع:</span>
+                        <span>{{ project.current_funding|format_currency }} ({{ project.funding_progress|format_percentage }})</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: {{ project.funding_progress }}%"></div>
+                    </div>
+                    <div class="contribution-detail">
+                        <span class="contribution-label">متبقي:</span>
+                        <span>{{ project.days_remaining()|format_days }}</span>
+                    </div>
+                    <div class="contribution-footer">
+                        <div class="returns">
+                            <i class="fas fa-chart-line"></i>
+                            عائد متوقع: {{ project.expected_return }}
+                        </div>
+                        <a href="{{ url_for('main.project_detail', project_id=project.id) }}" class="view-project">
+                            <i class="fas fa-eye"></i>
+                            عرض المشروع
+                        </a>
+                    </div>
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="{{ url_for('funder.fund_project', project_id=project.id) }}" class="btn btn-primary flex-grow-1">
+                            <i class="fas fa-hand-holding-usd me-1"></i>ادعم
+                        </a>
+                        
+                        {% if project.id in watchlist_project_ids %}
+                            <form action="{{ url_for('funder.remove_from_watchlist', project_id=project.id) }}" method="POST" class="flex-grow-1">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-bookmark-slash me-1"></i>إزالة
+                                </button>
+                            </form>
+                        {% else %}
+                            <form action="{{ url_for('funder.add_to_watchlist', project_id=project.id) }}" method="POST" class="flex-grow-1">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-bookmark me-1"></i>متابعة
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle me-2"></i>
+        لا توجد مشاريع مطابقة للفلتر المحدد. يرجى تغيير معايير البحث أو المحاولة لاحقاً.
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}إدارة المشاريع | وقف الابتكار{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>إدارة المشاريع</h1>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-right me-2"></i>العودة للوحة التحكم
+        </a>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">تصفية المشاريع</h5>
+            <form method="GET" action="{{ url_for('admin.projects') }}" class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label">حالة المشروع</label>
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="all" {% if status == 'all' %}selected{% endif %}>جميع الحالات</option>
+                        <option value="pending" {% if status == 'pending' %}selected{% endif %}>قيد المراجعة</option>
+                        <option value="funding" {% if status == 'funding' %}selected{% endif %}>قيد التمويل</option>
+                        <option value="funded" {% if status == 'funded' %}selected{% endif %}>مكتمل التمويل</option>
+                        <option value="completed" {% if status == 'completed' %}selected{% endif %}>مكتمل</option>
+                        <option value="rejected" {% if status == 'rejected' %}selected{% endif %}>مرفوض</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">فئة المشروع</label>
+                    <select name="category" class="form-select" onchange="this.form.submit()">
+                        <option value="all" {% if category == 'all' %}selected{% endif %}>جميع الفئات</option>
+                        <option value="tech" {% if category == 'tech' %}selected{% endif %}>تقني</option>
+                        <option value="medical" {% if category == 'medical' %}selected{% endif %}>طبي</option>
+                        <option value="industrial" {% if category == 'industrial' %}selected{% endif %}>صناعي</option>
+                        <option value="agricultural" {% if category == 'agricultural' %}selected{% endif %}>زراعي</option>
+                        <option value="educational" {% if category == 'educational' %}selected{% endif %}>تعليمي</option>
+                        <option value="environmental" {% if category == 'environmental' %}selected{% endif %}>بيئي</option>
+                        <option value="energy" {% if category == 'energy' %}selected{% endif %}>طاقة</option>
+                        <option value="other" {% if category == 'other' %}selected{% endif %}>أخرى</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">تطبيق</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Projects List -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title mb-3">قائمة المشاريع</h5>
+            
+            {% if projects %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>عنوان المشروع</th>
+                                <th>الفئة</th>
+                                <th>الحالة</th>
+                                <th>صاحب المشروع</th>
+                                <th>تاريخ التقديم</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in projects %}
+                                <tr>
+                                    <td>{{ project.id }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if project.image %}
+                                                <img src="{{ url_for('static', filename=project.image) }}" class="rounded me-2" width="40" height="40" style="object-fit: cover;" alt="{{ project.title }}">
+                                            {% else %}
+                                                <img src="{{ url_for('static', filename='images/default_project.jpg') }}" class="rounded me-2" width="40" height="40" alt="Default">
+                                            {% endif %}
+                                            {{ project.title }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if project.category == 'tech' %}
+                                            تقني
+                                        {% elif project.category == 'medical' %}
+                                            طبي
+                                        {% elif project.category == 'industrial' %}
+                                            صناعي
+                                        {% elif project.category == 'agricultural' %}
+                                            زراعي
+                                        {% elif project.category == 'educational' %}
+                                            تعليمي
+                                        {% elif project.category == 'environmental' %}
+                                            بيئي
+                                        {% elif project.category == 'energy' %}
+                                            طاقة
+                                        {% else %}
+                                            أخرى
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if project.status == 'draft' %}
+                                            <span class="badge bg-secondary">مسودة</span>
+                                        {% elif project.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">قيد المراجعة</span>
+                                        {% elif project.status == 'funding' %}
+                                            <span class="badge bg-primary">قيد التمويل</span>
+                                        {% elif project.status == 'funded' %}
+                                            <span class="badge bg-success">مكتمل التمويل</span>
+                                        {% elif project.status == 'completed' %}
+                                            <span class="badge bg-info">مكتمل</span>
+                                        {% elif project.status == 'rejected' %}
+                                            <span class="badge bg-danger">مرفوض</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ project.owner.full_name }}</td>
+                                    <td>{{ project.submitted_at.strftime('%Y-%m-%d') if project.submitted_at else 'غير محدد' }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            {% if project.status == 'pending' %}
+                                                <a href="{{ url_for('admin.review_project', project_id=project.id) }}" class="btn btn-primary">
+                                                    <i class="fas fa-clipboard-check me-1"></i>مراجعة
+                                                </a>
+                                            {% endif %}
+                                            <a href="{{ url_for('main.project_detail', project_id=project.id) }}" class="btn btn-outline-secondary">
+                                                <i class="fas fa-eye me-1"></i>عرض
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    لا توجد مشاريع مطابقة للفلتر المحدد
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

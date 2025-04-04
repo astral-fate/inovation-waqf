@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}لوحة تحكم المسؤول | وقف الابتكار{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">لوحة تحكم المسؤول</h1>
+    
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ total_users }}</h3>
+                    <p class="card-text">إجمالي المستخدمين</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ total_projects }}</h3>
+                    <p class="card-text">إجمالي المشاريع</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ active_projects }}</h3>
+                    <p class="card-text">المشاريع النشطة</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ pending_projects }}</h3>
+                    <p class="card-text">مشاريع بانتظار المراجعة</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">المشاريع بانتظار المراجعة</h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_projects > 0 %}
+                        <a href="{{ url_for('admin.projects', status='pending') }}" class="btn btn-primary">استعراض المشاريع</a>
+                    {% else %}
+                        <p class="text-center mb-0">لا توجد مشاريع بانتظار المراجعة</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">إدارة المستخدمين</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-primary">استعراض المستخدمين</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

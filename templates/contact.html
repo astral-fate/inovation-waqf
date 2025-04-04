@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}اتصل بنا | وقف الابتكار{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5 position-relative">
+        اتصل بنا
+        <span class="position-absolute start-50 translate-middle-x" style="bottom: -15px; width: 70px; height: 3px; background-color: var(--primary);"></span>
+    </h1>
+
+    <div class="row g-4 mb-5">
+        <!-- Contact Information -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">معلومات التواصل</h3>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="mb-1">البريد الإلكتروني</h5>
+                            <p class="mb-0">
+                                <a href="mailto:Contact@neo.sa" class="text-decoration-none">Contact@neo.sa</a>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="mb-1">العنوان</h5>
+                            <p class="mb-0">المملكة العربية السعودية، الرياض</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="mb-1">هاتف</h5>
+                            <p class="mb-0">+966-XX-XXX-XXXX</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="contact-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="mb-1">الموقع الإلكتروني</h5>
+                            <p class="mb-0">
+                                <a href="http://www.neo.sa" class="text-decoration-none" target="_blank">www.neo.sa</a>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h5 class="mb-3">تابعنا على</h5>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="social-icon" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-icon" target="_blank">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="social-icon" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contact Form -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">راسلنا</h3>
+                    
+                    <form method="POST" action="{{ url_for('main.contact') }}">
+                        {{ form.csrf_token }}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    {{ form.name.label(class="form-label") }}
+                                    {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), placeholder="الاسم الكامل") }}
+                                    {% if form.name.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.name.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    {{ form.email.label(class="form-label") }}
+                                    {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="البريد الإلكتروني") }}
+                                    {% if form.email.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.email.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="form-group mb-3">
+                                    {{ form.subject.label(class="form-label") }}
+                                    {{ form.subject(class="form-control" + (" is-invalid" if form.subject.errors else ""), placeholder="موضوع الرسالة") }}
+                                    {% if form.subject.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.subject.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="form-group mb-3">
+                                    {{ form.message.label(class="form-label") }}
+                                    {{ form.message(class="form-control" + (" is-invalid" if form.message.errors else ""), rows="6", placeholder="اكتب رسالتك هنا...") }}
+                                    {% if form.message.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.message.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Team Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">فريق العمل</h2>
+            
+            <div class="row g-4 mt-2">
+                <div class="col-md-6">
+                    <div class="card team-card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='images/default_profile.jpg') }}" class="rounded-circle me-4" width="100" height="100" alt="د. محمد بشيري">
+                                <div>
+                                    <h4 class="mb-1">د. محمد بشيري</h4>
+                                    <p class="text-muted mb-3">أستاذ مساعد بكلية الحاسبات وتقنية المعلومات في جامعة الملك عبد العزيز</p>
+                                    <p class="mb-0">حاصل على درجة الماجستير في تقنية المعلومات من جامعة غريفيث باستراليا وحاصل على درجة الدكتوراه في علوم الحاسب بجامعة دورهام بالمملكة المتحدة.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card team-card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='images/default_profile.jpg') }}" class="rounded-circle me-4" width="100" height="100" alt="د. فهد البشري">
+                                <div>
+                                    <h4 class="mb-1">د. فهد البشري</h4>
+                                    <p class="text-muted mb-3">مستشار في وزارة التعليم</p>
+                                    <p class="mb-0">متخصص في مجال الاستشارات التعليمية والابتكار، مع خبرة طويلة في دعم المشاريع البحثية والتطويرية.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FAQ Section -->
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h2 class="text-center mb-4">الأسئلة الشائعة</h2>
+            
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item border-0 shadow-sm mb-3">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            ما هي منصة وقف الابتكار؟
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            منصة وقف الابتكار هي منصة رقمية وطنية مبتكرة للتمويل الجماعي الوقفي، تعنى بدعم الأبحاث والابتكارات المستدامة في مختلف القطاعات الحيوية. تجمع المنصة بين الباحثين والمبتكرين من جهة، والداعمين من أفراد ومؤسسات من جهة أخرى، من خلال نموذج تمويلي شفاف ومستدام.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item border-0 shadow-sm mb-3">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            كيف يمكنني تقديم مشروعي للتمويل؟
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            يمكنك تقديم مشروعك من خلال التسجيل في المنصة كصاحب مشروع، ثم إنشاء مشروع جديد وتعبئة كافة البيانات المطلوبة. بعد ذلك، سيخضع المشروع لعملية تحقق ومراجعة، وفي حال الموافقة عليه، سيتم عرضه للتمويل على المنصة.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item border-0 shadow-sm mb-3">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            ما هو نموذج التمويل المستخدم في المنصة؟
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            تعتمد المنصة نموذج تمويل جماعي مرن يدعم المساهمات المتنوعة (تبرع مباشر أو استثمار موجه بعائد محتمل). النموذج متوافق تماماً مع الشريعة الإسلامية ومبادئ الوقف، مما يضمن استدامة التمويل وشفافيته، ويتيح للمساهمين إمكانية الحصول على عوائد من المشاريع الناجحة.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item border-0 shadow-sm mb-3">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            كيف يتم التحقق من جودة المشاريع المعروضة؟
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            تخضع جميع المشاريع لعملية تحقق دقيقة بالتعاون مع شركاء متخصصين (بنوك، هيئات ابتكار، خبراء) لضمان الجودة والمصداقية قبل عرضها. تشمل المراجعة التحقق من هوية أصحاب المشاريع، جدوى المشروع، خطط التنفيذ، والتوقعات المالية.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .contact-icon {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(30, 136, 229, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+    }
+    
+    .social-icon {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(30, 136, 229, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .social-icon:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .team-card {
+        transition: transform 0.3s ease;
+    }
+    
+    .team-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(30, 136, 229, 0.1);
+        color: var(--primary);
+        box-shadow: none;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(30, 136, 229, 0.1);
+    }
+</style>
+{% endblock %}

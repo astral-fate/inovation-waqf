@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}المشاريع | وقف الابتكار{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>مشاريع وقف الابتكار</h1>
+        {% if current_user.is_authenticated and current_user.is_project_owner() %}
+            <a href="{{ url_for('project_owner.create_project') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>قدم مشروعك
+            </a>
+        {% elif not current_user.is_authenticated %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary">
+                <i class="fas fa-user-plus me-2"></i>انضم وقدم مشروعك
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Filter Section (Optional) -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('main.projects') }}" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">فئة المشروع</label>
+                    <select name="category" class="form-select">
+                        <option value="all" selected>جميع الفئات</option>
+                        <option value="tech">تقني</option>
+                        <option value="medical">طبي</option>
+                        <option value="industrial">صناعي</option>
+                        <option value="agricultural">زراعي</option>
+                        <option value="educational">تعليمي</option>
+                        <option value="environmental">بيئي</option>
+                        <option value="energy">طاقة</option>
+                        <option value="other">أخرى</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">حالة المشروع</label>
+                    <select name="status" class="form-select">
+                        <option value="all" selected>جميع الحالات</option>
+                        <option value="funding">قيد التمويل</option>
+                        <option value="funded">مكتمل التمويل</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">تصفية</button>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <a href="{{ url_for('main.projects') }}" class="btn btn-outline-secondary w-100">إعادة ضبط</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Projects Grid -->
+    {% if projects %}
+        <div class="row g-4">
+            {% for project in projects %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card project-card h-100">
+                        {% if project.image %}
+                            <img src="{{ url_for('static', filename=project.image) }}" class="card-img-top" alt="{{ project.title }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/default_project.jpg') }}" class="card-img-top" alt="{{ project.title }}">
+                        {% endif %}
+                        
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="project-status 
+                                    {% if project.status == 'funding' %}status-funding
+                                    {% elif project.status == 'funded' %}status-funded
+                                    {% endif %}">
+                                    {% if project.status == 'funding' %}قيد التمويل
+                                    {% elif project.status == 'funded' %}مكتمل التمويل
+                                    {% endif %}
+                                </div>
+                                
+                                {% if project.category == 'tech' %}
+                                    <span class="project-category">تقني</span>
+                                {% elif project.category == 'medical' %}
+                                    <span class="project-category">طبي</span>
+                                {% elif project.category == 'industrial' %}
+                                    <span class="project-category">صناعي</span>
+                                {% elif project.category == 'agricultural' %}
+                                    <span class="project-category">زراعي</span>
+                                {% elif project.category == 'educational' %}
+                                    <span class="project-category">تعليمي</span>
+                                {% elif project.category == 'environmental' %}
+                                    <span class="project-category">بيئي</span>
+                                {% elif project.category == 'energy' %}
+                                    <span class="project-category">طاقة</span>
+                                {% else %}
+                                    <span class="project-category">أخرى</span>
+                                {% endif %}
+                            </div>
+                            
+                            <h5 class="card-title">{{ project.title }}</h5>
+                            <p class="card-text text-muted">{{ project.description[:150] }}{% if project.description|length > 150 %}...{% endif %}</p>
+                            
+                            <div class="d-flex justify-content-between my-3">
+                                <span class="text-muted">{{ project.funding_progress|format_percentage }} من التمويل</span>
+                                <span class="text-muted">{{ project.days_remaining()|format_days }}</span>
+                            </div>
+                            
+                            <div class="progress-bar mb-3">
+                                <div class="progress" style="width: {{ project.funding_progress }}%"></div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted small">{{ project.fundings|length if project.fundings else 0 }} داعم</span>
+                                <span class="fw-bold">{{ project.current_funding|format_currency }}</span>
+                            </div>
+                            
+                            <div class="mt-3 text-center">
+                                <a href="{{ url_for('main.project_detail', project_id=project.id) }}" class="btn btn-outline-primary w-100">عرض المشروع</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center my-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h3>لا توجد مشاريع متاحة</h3>
+            <p class="text-muted">لم يتم العثور على مشاريع مطابقة للمعايير المحددة.</p>
+            {% if current_user.is_authenticated and current_user.is_project_owner() %}
+                <a href="{{ url_for('project_owner.create_project') }}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus me-2"></i>قدم مشروعك الآن
+                </a>
+            {% elif not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary mt-3">
+                    <i class="fas fa-user-plus me-2"></i>انضم وقدم مشروعك
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

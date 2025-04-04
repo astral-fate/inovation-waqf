@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% block title %}مراجعة المشروع | وقف الابتكار{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="{{ url_for('main.index') }}" class="sidebar-logo">
+                وقف <span>الابتكار</span>
+            </a>
+        </div>
+        
+        <div class="user-info">
+            <img src="{{ url_for('static', filename=current_user.profile_image) }}" alt="{{ current_user.full_name }}" class="user-avatar">
+            <div>
+                <p class="user-name">{{ current_user.full_name }}</p>
+                <p class="user-role">مسؤول النظام</p>
+            </div>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="menu-item">
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    لوحة القيادة
+                </a>
+            </li>
+            <li class="menu-item active">
+                <a href="{{ url_for('admin.projects') }}">
+                    <i class="fas fa-project-diagram"></i>
+                    المشاريع
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="{{ url_for('admin.users') }}">
+                    <i class="fas fa-users"></i>
+                    المستخدمين
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    التمويل
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#">
+                    <i class="fas fa-chart-line"></i>
+                    التقارير
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#">
+                    <i class="fas fa-cog"></i>
+                    الإعدادات
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                تسجيل الخروج
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="dashboard-header">
+            <ul class="breadcrumb">
+                <li><a href="{{ url_for('admin.dashboard') }}">لوحة القيادة</a></li>
+                <li><a href="{{ url_for('admin.projects') }}">المشاريع</a></li>
+                <li>مراجعة المشروع</li>
+            </ul>
+            <h1 class="page-title">مراجعة المشروع</h1>
+        </div>
+        
+        <div class="row">
+            <!-- Project Details -->
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3>{{ project.title }}</h3>
+                            <span class="project-status status-pending">قيد المراجعة</span>
+                        </div>
+                        
+                        {% if project.image %}
+                            <img src="{{ url_for('static', filename=project.image) }}" alt="{{ project.title }}" class="img-fluid rounded mb-4" style="max-height: 300px; width: 100%; object-fit: cover;">
+                        {% endif %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>تفاصيل المشروع</h5>
+                                <table class="table">
+                                    <tr>
+                                        <th>صاحب المشروع:</th>
+                                        <td>{{ project.owner.full_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>فئة المشروع:</th>
+                                        <td>
+                                            {% if project.category == 'tech' %}
+                                                تقني
+                                            {% elif project.category == 'medical' %}
+                                                طبي
+                                            {% elif project.category == 'industrial' %}
+                                                صناعي
+                                            {% elif project.category == 'agricultural' %}
+                                                زراعي
+                                            {% elif project.category == 'educational' %}
+                                                تعليمي
+                                            {% elif project.category == 'environmental' %}
+                                                بيئي
+                                            {% elif project.category == 'energy' %}
+                                                طاقة
+                                            {% else %}
+                                                أخرى
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>المبلغ المطلوب:</th>
+                                        <td>{{ project.funding_goal|format_currency }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>العائد المتوقع:</th>
+                                        <td>{{ project.expected_return }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>تاريخ التقديم:</th>
+                                        <td>{{ project.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>بيانات صاحب المشروع</h5>
+                                <table class="table">
+                                    <tr>
+                                        <th>الاسم الكامل:</th>
+                                        <td>{{ project.owner.full_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>البريد الإلكتروني:</th>
+                                        <td>{{ project.owner.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>تاريخ التسجيل:</th>
+                                        <td>{{ project.owner.created_at.strftime('%Y-%m-%d') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>عدد المشاريع:</th>
+                                        <td>{{ project.owner.projects|length }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <h5>وصف المشروع</h5>
+                        <div class="p-3 bg-light rounded mb-4">
+                            {{ project.description|nl2br }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Review Form -->
+            <div class="col-lg-4">
+                <div class="card sticky-top" style="top: 20px;">
+                    <div class="card-header">
+                        <h5 class="mb-0">مراجعة المشروع</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('admin.review_project', project_id=project.id) }}">
+                            {{ form.csrf_token }}
+                            
+                            <div class="mb-3">
+                                {{ form.status.label(class="form-label") }}
+                                {{ form.status(class="form-select" + (" is-invalid" if form.status.errors else "")) }}
+                                {% if form.status.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.status.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-4">
+                                {{ form.admin_notes.label(class="form-label") }}
+                                {{ form.admin_notes(class="form-control" + (" is-invalid" if form.admin_notes.errors else ""), rows=5) }}
+                                {% if form.admin_notes.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.admin_notes.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">أضف ملاحظات وتعليقات حول المشروع لصاحب المشروع.</div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                {{ form.submit(class="btn btn-primary btn-lg") }}
+                                <a href="{{ url_for('admin.projects', status='pending_review') }}" class="btn btn-outline-secondary">إلغاء</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">قائمة التحقق</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" id="check1">
+                            <label class="form-check-label" for="check1">وصف المشروع واضح ومفهوم</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" id="check2">
+                            <label class="form-check-label" for="check2">المبلغ المطلوب منطقي ومناسب للمشروع</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" id="check3">
+                            <label class="form-check-label" for="check3">العائد المتوقع واقعي وقابل للتحقيق</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" id="check4">
+                            <label class="form-check-label" for="check4">المشروع يتوافق مع شروط وأهداف المنصة</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" id="check5">
+                            <label class="form-check-label" for="check5">المشروع له تأثير إيجابي في المجتمع</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="check6">
+                            <label class="form-check-label" for="check6">المشروع يتماشى مع رؤية ٢٠٣٠</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+        }
+    });
+</script>
+{% endblock %}

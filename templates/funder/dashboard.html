@@ -1,0 +1,473 @@
+{% extends 'base.html' %}
+
+{% block title %}لوحة تحكم الداعم | وقف الابتكار{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="{{ url_for('main.index') }}" class="sidebar-logo">
+                وقف <span>الابتكار</span>
+            </a>
+        </div>
+        
+        <div class="user-info">
+            <img src="{{ url_for('static', filename=current_user.profile_image) }}" alt="{{ current_user.full_name }}" class="user-avatar">
+            <div>
+                <p class="user-name">{{ current_user.full_name }}</p>
+                <p class="user-role">داعم ومستثمر</p>
+            </div>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="menu-item active">
+                <a href="{{ url_for('funder.dashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    لوحة البيانات
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="{{ url_for('funder.my_contributions') }}">
+                    <i class="fas fa-folder"></i>
+                    مساهماتي
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="{{ url_for('funder.watchlist') }}">
+                    <i class="fas fa-bookmark"></i>
+                    قائمة المتابعة
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#">
+                    <i class="fas fa-chart-line"></i>
+                    تقارير الأثر/العائد
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="{{ url_for('funder.explore') }}">
+                    <i class="fas fa-search"></i>
+                    استكشاف المشاريع
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#">
+                    <i class="fas fa-bell"></i>
+                    الإشعارات
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="{{ url_for('funder.profile') }}">
+                    <i class="fas fa-user-cog"></i>
+                    الملف الشخصي
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#">
+                    <i class="fas fa-headset"></i>
+                    الدعم
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                تسجيل الخروج
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="dashboard-header">
+            <ul class="breadcrumb">
+                <li><a href="{{ url_for('main.index') }}">الرئيسية</a></li>
+                <li>لوحة البيانات</li>
+            </ul>
+            <h1 class="page-title">لوحة البيانات</h1>
+            <p>مرحباً بك {{ current_user.full_name }}، هذه نظرة عامة على محفظتك ومساهماتك</p>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-title">إجمالي المساهمات</p>
+                    <h3 class="stat-value">{{ total_contributions|format_currency }}</h3>
+                    <p class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        في {{ fundings|length }} مشاريع
+                    </p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background-color: rgba(38, 166, 154, 0.1); color: var(--secondary);">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-title">المشاريع النشطة</p>
+                    <h3 class="stat-value">{{ active_projects }}</h3>
+                    <p class="stat-change positive">
+                        <i class="fas fa-check-circle"></i>
+                        {{ completed_projects }} مشاريع مكتملة
+                    </p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background-color: rgba(255, 87, 34, 0.1); color: var(--accent);">
+                    <i class="fas fa-bookmark"></i>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-title">قائمة المتابعة</p>
+                    <h3 class="stat-value">{{ watchlist_projects|length }}</h3>
+                    <p class="stat-change">
+                        <i class="fas fa-heart"></i>
+                        مشاريع تتابعها
+                    </p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background-color: rgba(255, 152, 0, 0.1); color: var(--warning);">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-title">متوسط العائد المتوقع</p>
+                    <h3 class="stat-value">٢٠-٢٥٪</h3>
+                    <p class="stat-change positive">
+                        <i class="fas fa-chart-line"></i>
+                        عائد محتمل
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- My Contributions -->
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">مساهماتي</h5>
+                        <a href="{{ url_for('funder.my_contributions') }}" class="text-primary small">عرض الكل</a>
+                    </div>
+                    <div class="card-body">
+                        {% if fundings %}
+                            <div class="row">
+                                {% for funding in fundings[:3] %}
+                                    {% set project = funding.project %}
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="card h-100">
+                                            {% if project.image %}
+                                                <img src="{{ url_for('static', filename=project.image) }}" class="card-img-top" alt="{{ project.title }}">
+                                            {% else %}
+                                                <img src="{{ url_for('static', filename='images/default_project.jpg') }}" class="card-img-top" alt="{{ project.title }}">
+                                            {% endif %}
+                                            
+                                            <div class="card-body">
+                                                {% if project.status == 'funding' %}
+                                                    <div class="project-status status-funding">قيد التمويل</div>
+                                                {% elif project.status == 'funded' %}
+                                                    <div class="project-status status-funded">مكتمل التمويل</div>
+                                                {% elif project.status == 'completed' %}
+                                                    <div class="project-status status-completed">مكتمل</div>
+                                                {% endif %}
+                                                
+                                                <h5 class="card-title">{{ project.title }}</h5>
+                                                
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span class="text-muted">مساهمتك:</span>
+                                                    <span class="fw-bold">{{ funding.amount|format_currency }}</span>
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span class="text-muted">التقدم:</span>
+                                                    <span>{{ project.funding_progress|format_percentage }}</span>
+                                                </div>
+                                                
+                                                <div class="progress-bar mb-3">
+                                                    <div class="progress" style="width: {{ project.funding_progress }}%"></div>
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">{{ funding.date.strftime('%Y-%m-%d') }}</small>
+                                                    <a href="{{ url_for('main.project_detail', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">
+                                                        عرض
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                ليس لديك أي مساهمات بعد. <a href="{{ url_for('funder.explore') }}" class="alert-link">استكشف المشاريع</a> وابدأ في الاستثمار!
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Watchlist -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">قائمة المتابعة</h5>
+                        <a href="{{ url_for('funder.watchlist') }}" class="text-primary small">عرض الكل</a>
+                    </div>
+                    <div class="card-body">
+                        {% if watchlist_projects %}
+                            <div class="row">
+                                {% for project in watchlist_projects[:3] %}
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="card h-100">
+                                            {% if project.image %}
+                                                <img src="{{ url_for('static', filename=project.image) }}" class="card-img-top" alt="{{ project.title }}">
+                                            {% else %}
+                                                <img src="{{ url_for('static', filename='images/default_project.jpg') }}" class="card-img-top" alt="{{ project.title }}">
+                                            {% endif %}
+                                            
+                                            <div class="card-body">
+                                                {% if project.status == 'funding' %}
+                                                    <div class="project-status status-funding">قيد التمويل</div>
+                                                {% elif project.status == 'funded' %}
+                                                    <div class="project-status status-funded">مكتمل التمويل</div>
+                                                {% elif project.status == 'completed' %}
+                                                    <div class="project-status status-completed">مكتمل</div>
+                                                {% endif %}
+                                                
+                                                <h5 class="card-title">{{ project.title }}</h5>
+                                                
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span class="text-muted">الهدف:</span>
+                                                    <span>{{ project.funding_goal|format_currency }}</span>
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span class="text-muted">التقدم:</span>
+                                                    <span>{{ project.funding_progress|format_percentage }}</span>
+                                                </div>
+                                                
+                                                <div class="progress-bar mb-3">
+                                                    <div class="progress" style="width: {{ project.funding_progress }}%"></div>
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    {% if project.days_remaining() > 0 %}
+                                                        <small class="text-muted">{{ project.days_remaining()|format_days }} متبقية</small>
+                                                    {% else %}
+                                                        <small class="text-muted">انتهى الوقت</small>
+                                                    {% endif %}
+                                                    
+                                                    <div>
+                                                        <a href="{{ url_for('funder.fund_project', project_id=project.id) }}" class="btn btn-sm btn-primary me-1">
+                                                            دعم
+                                                        </a>
+                                                        <a href="{{ url_for('main.project_detail', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">
+                                                            عرض
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                قائمة المتابعة فارغة. <a href="{{ url_for('funder.explore') }}" class="alert-link">استكشف المشاريع</a> وأضف المشاريع التي تهمك إلى قائمة المتابعة!
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar Content -->
+            <div class="col-lg-4">
+                <!-- Recent Updates -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">آخر تحديثات المشاريع</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            {% if recent_updates %}
+                                {% for update in recent_updates %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex">
+                                            {% if update.update_type == 'milestone' %}
+                                                <div class="me-3 text-primary">
+                                                    <i class="fas fa-flag-checkered"></i>
+                                                </div>
+                                            {% elif update.update_type == 'return' %}
+                                                <div class="me-3 text-success">
+                                                    <i class="fas fa-percentage"></i>
+                                                </div>
+                                            {% else %}
+                                                <div class="me-3 text-warning">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <div>
+                                                <h6 class="mb-1">{{ update.title }}</h6>
+                                                <p class="mb-1">{{ update.content[:100] }}{% if update.content|length > 100 %}...{% endif %}</p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">{{ update.date.strftime('%Y-%m-%d') }}</small>
+                                                    <a href="{{ url_for('main.project_detail', project_id=update.project_id) }}" class="small text-primary">المشروع</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="list-group-item text-center py-4">
+                                    <p class="text-muted mb-0">لا توجد تحديثات جديدة</p>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Recommended Projects -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">مشاريع مقترحة لك</h5>
+                        <a href="{{ url_for('funder.explore') }}" class="text-primary small">عرض المزيد</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            {% if recommended_projects %}
+                                {% for project in recommended_projects %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex">
+                                            {% if project.image %}
+                                                <img src="{{ url_for('static', filename=project.image) }}" class="rounded me-3" width="60" height="60" style="object-fit: cover;">
+                                            {% else %}
+                                                <img src="{{ url_for('static', filename='images/default_project.jpg') }}" class="rounded me-3" width="60" height="60" style="object-fit: cover;">
+                                            {% endif %}
+                                            
+                                            <div style="flex: 1;">
+                                                <h6 class="mb-1">{{ project.title }}</h6>
+                                                
+                                                {% if project.category == 'tech' %}
+                                                    <span class="badge bg-primary">تقني</span>
+                                                {% elif project.category == 'medical' %}
+                                                    <span class="badge bg-info">طبي</span>
+                                                {% elif project.category == 'industrial' %}
+                                                    <span class="badge bg-secondary">صناعي</span>
+                                                {% elif project.category == 'agricultural' %}
+                                                    <span class="badge bg-success">زراعي</span>
+                                                {% elif project.category == 'educational' %}
+                                                    <span class="badge bg-warning text-dark">تعليمي</span>
+                                                {% elif project.category == 'environmental' %}
+                                                    <span class="badge bg-success">بيئي</span>
+                                                {% elif project.category == 'energy' %}
+                                                    <span class="badge" style="background-color: #ff9800;">طاقة</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">أخرى</span>
+                                                {% endif %}
+                                                
+                                                <div class="d-flex justify-content-between mt-2">
+                                                    <small>{{ project.funding_progress|format_percentage }} تمويل</small>
+                                                    <small>{{ project.days_remaining()|format_days }}</small>
+                                                </div>
+                                                
+                                                <div class="progress-bar mt-1 mb-2">
+                                                    <div class="progress" style="width: {{ project.funding_progress }}%"></div>
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <small class="text-muted">{{ project.expected_return }} عائد متوقع</small>
+                                                    </div>
+                                                    <div>
+                                                        <form method="POST" action="{{ url_for('funder.add_to_watchlist', project_id=project.id) }}" class="d-inline">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-primary me-1">
+                                                                <i class="fas fa-bookmark"></i>
+                                                            </button>
+                                                        </form>
+                                                        <a href="{{ url_for('main.project_detail', project_id=project.id) }}" class="btn btn-sm btn-primary">
+                                                            عرض
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="list-group-item text-center py-4">
+                                    <p class="text-muted mb-0">لا توجد مشاريع مقترحة حالياً</p>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Investment Summary -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">ملخص الاستثمار</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="investmentChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+        }
+        
+        // Investment Chart
+        const ctx = document.getElementById('investmentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['قيد التمويل', 'مكتمل التمويل', 'مكتمل'],
+                datasets: [{
+                    data: [{{ active_projects }}, {{ completed_projects - active_projects }}, {{ completed_projects }}],
+                    backgroundColor: [
+                        '#1e88e5',
+                        '#4caf50',
+                        '#26a69a'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}وقف الابتكار{% endblock %}</title>
+    
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts - Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS - Make sure this comes AFTER Bootstrap to override properly -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
+                وقف <span class="text-primary">الابتكار</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.projects' %}active{% endif %}" href="{{ url_for('main.projects') }}">المشاريع</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.how_it_works' %}active{% endif %}" href="{{ url_for('main.how_it_works') }}">كيف نعمل</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}" href="{{ url_for('main.about') }}">من نحن</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.contact' %}active{% endif %}" href="{{ url_for('main.contact') }}">اتصل بنا</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex">
+                    {% if current_user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{{ url_for('static', filename=current_user.profile_image) }}" class="rounded-circle me-1" width="24" height="24">
+                                {{ current_user.full_name }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                {% if current_user.is_admin() %}
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">لوحة التحكم</a></li>
+                                {% elif current_user.is_project_owner() %}
+                                    <li><a class="dropdown-item" href="{{ url_for('project_owner.dashboard') }}">لوحة التحكم</a></li>
+                                {% elif current_user.is_funder() %}
+                                    <li><a class="dropdown-item" href="{{ url_for('funder.dashboard') }}">لوحة التحكم</a></li>
+                                {% endif %}
+                                
+                                {% if current_user.is_project_owner() %}
+                                    <li><a class="dropdown-item" href="{{ url_for('project_owner.create_project') }}">مشروع جديد</a></li>
+                                {% endif %}
+                                
+                                <li><a class="dropdown-item" href="{% if current_user.is_admin() %}#{% elif current_user.is_project_owner() %}{{ url_for('project_owner.profile') }}{% else %}{{ url_for('funder.profile') }}{% endif %}">الملف الشخصي</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">تسجيل الخروج</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary me-2">تسجيل الدخول</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">تسجيل حساب</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">وقف الابتكار</h5>
+                    <p>منصة تمويل جماعي تربط المبتكرين بالداعمين لتمويل مشاريع ابتكارية ذات أثر إيجابي وعوائد مشتركة.</p>
+                </div>
+                
+                <div class="col-md-2 mb-4">
+                    <h5 class="mb-3">روابط سريعة</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('main.index') }}" class="text-white text-decoration-none">الرئيسية</a></li>
+                        <li><a href="{{ url_for('main.projects') }}" class="text-white text-decoration-none">المشاريع</a></li>
+                        <li><a href="{{ url_for('main.how_it_works') }}" class="text-white text-decoration-none">كيف نعمل</a></li>
+                        <li><a href="{{ url_for('main.about') }}" class="text-white text-decoration-none">من نحن</a></li>
+                        <li><a href="{{ url_for('main.contact') }}" class="text-white text-decoration-none">اتصل بنا</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 mb-4">
+                    <h5 class="mb-3">الدعم</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('main.faq') }}" class="text-white text-decoration-none">الأسئلة الشائعة</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">سياسة الخصوصية</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">الشروط والأحكام</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">تواصل معنا</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fab fa-twitter me-2"></i><a href="#" class="text-white text-decoration-none">تويتر</a></li>
+                        <li class="mb-2"><i class="fab fa-linkedin me-2"></i><a href="#" class="text-white text-decoration-none">لينكد إن</a></li>
+                        <li class="mb-2"><i class="fab fa-instagram me-2"></i><a href="#" class="text-white text-decoration-none">انستغرام</a></li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i><a href="mailto:info@waqf-innovation.sa" class="text-white text-decoration-none">info@waqf-innovation.sa</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-top border-secondary pt-4 mt-3 text-center">
+                <p>جميع الحقوق محفوظة &copy; {{ now.year }} وقف الابتكار | بالشراكة مع وزارة الابتكار وهيئة المنشآت الصغيرة والمتوسطة</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1>دعم الابتكار عبر التمويل الجماعي</h1>
+        <p>منصة "وقف الابتكار" تجمع بين المبتكرين والداعمين لتمويل مشاريع ابتكارية ذات أثر إيجابي وعوائد مشتركة</p>
+        <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
+            {% if current_user.is_authenticated %}
+                {% if current_user.is_project_owner() %}
+                    <a href="{{ url_for('project_owner.create_project') }}" class="btn btn-secondary btn-lg">قدم مشروعك</a>
+                {% else %}
+                    <a href="{{ url_for('funder.explore') }}" class="btn btn-primary btn-lg">ابدأ الاستثمار</a>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-secondary btn-lg">قدم مشروعك</a>
+                <a href="{{ url_for('main.projects') }}" class="btn btn-primary btn-lg">تصفح المشاريع</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 position-relative">
+            كيف تعمل المنصة
+            <span class="position-absolute start-50 translate-middle-x" style="bottom: -15px; width: 70px; height: 3px; background-color: var(--primary);"></span>
+        </h2>
+        
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center py-4">
+                        <div class="rounded-circle bg-light mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-file-alt text-primary fa-2x"></i>
+                        </div>
+                        <h4>تقديم المشروع</h4>
+                        <p class="text-muted">قدم فكرتك الابتكارية مع تفاصيل المشروع والميزانية المطلوبة خلال 5 دقائق فقط</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center py-4">
+                        <div class="rounded-circle bg-light mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-clipboard-check text-secondary fa-2x"></i>
+                        </div>
+                        <h4>التحقق والمراجعة</h4>
+                        <p class="text-muted">تتم مراجعة المشروع والتحقق منه من قبل شركائنا المختصين قبل عرضه للتمويل</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center py-4">
+                        <div class="rounded-circle bg-light mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-hand-holding-usd text-accent fa-2x"></i>
+                        </div>
+                        <h4>التمويل الجماعي</h4>
+                        <p class="text-muted">يبدأ تمويل المشروع من الداعمين مع تتبع التقدم المحرز في التمويل</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center py-4">
+                        <div class="rounded-circle bg-light mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-chart-line text-warning fa-2x"></i>
+                        </div>
+                        <h4>تنفيذ المشروع والعوائد</h4>
+                        <p class="text-muted">يتم تنفيذ المشروع ومشاركة التحديثات مع توزيع العوائد المحتملة على الداعمين</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Projects -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5 position-relative">
+            مشاريع مميزة
+            <span class="position-absolute start-50 translate-middle-x" style="bottom: -15px; width: 70px; height: 3px; background-color: var(--primary);"></span>
+        </h2>
+        
+        <div class="row g-4">
+            {% if featured_projects %}
+                {% for project in featured_projects %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card project-card h-100">
+                            {% if project.image %}
+                                <img src="{{ url_for('static', filename=project.image) }}" class="card-img-top" alt="{{ project.title }}">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/default_project.jpg') }}" class="card-img-top" alt="{{ project.title }}">
+                            {% endif %}
+                            
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <div class="project-status status-funding">قيد التمويل</div>
+                                    
+                                    {% if project.category == 'tech' %}
+                                        <span class="project-category">تقني</span>
+                                    {% elif project.category == 'medical' %}
+                                        <span class="project-category">طبي</span>
+                                    {% elif project.category == 'industrial' %}
+                                        <span class="project-category">صناعي</span>
+                                    {% elif project.category == 'agricultural' %}
+                                        <span class="project-category">زراعي</span>
+                                    {% elif project.category == 'educational' %}
+                                        <span class="project-category">تعليمي</span>
+                                    {% elif project.category == 'environmental' %}
+                                        <span class="project-category">بيئي</span>
+                                    {% elif project.category == 'energy' %}
+                                        <span class="project-category">طاقة</span>
+                                    {% else %}
+                                        <span class="project-category">أخرى</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <h5 class="card-title">{{ project.title }}</h5>
+                                <p class="card-text text-muted">{{ project.description[:150] }}{% if project.description|length > 150 %}...{% endif %}</p>
+                                
+                                <div class="d-flex justify-content-between my-3">
+                                    <span class="text-muted">{{ project.funding_progress|format_percentage }} من التمويل</span>
+                                    <span class="text-muted">{{ project.days_remaining()|format_days }}</span>
+                                </div>
+                                
+                                <div class="progress-bar mb-3">
+                                    <div class="progress" style="width: {{ project.funding_progress }}%"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">{{ project.funds|length }} داعم</span>
+                                    <span class="fw-bold">{{ project.current_funding|format_currency }}</span>
+                                </div>
+                                
+                                <div class="mt-3 text-center">
+                                    <a href="{{ url_for('main.project_detail', project_id=project.id) }}" class="btn btn-outline-primary w-100">عرض المشروع</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        لا توجد مشاريع مميزة حالياً. تفقد <a href="{{ url_for('main.projects') }}" class="alert-link">قائمة المشاريع</a> لرؤية جميع المشاريع المتاحة.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="{{ url_for('main.projects') }}" class="btn btn-primary">عرض جميع المشاريع</a>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5" style="background-color: var(--primary); color: white;">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3">
+                <h3>50+</h3>
+                <p>مشروع ابتكاري</p>
+            </div>
+            
+            <div class="col-md-3">
+                <h3>1200+</h3>
+                <p>داعم ومستثمر</p>
+            </div>
+            
+            <div class="col-md-3">
+                <h3>12,500,000 ريال</h3>
+                <p>تم جمعها</p>
+            </div>
+            
+            <div class="col-md-3">
+                <h3>25+</h3>
+                <p>مشروع مكتمل التمويل</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 position-relative">
+            قصص نجاح
+            <span class="position-absolute start-50 translate-middle-x" style="bottom: -15px; width: 70px; height: 3px; background-color: var(--primary);"></span>
+        </h2>
+        
+        <div class="row g-4">
+            {% if testimonials %}
+                {% for user in testimonials %}
+                    <div class="col-md-4">
+                        <div class="card testimonial h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <img src="{{ url_for('static', filename=user.profile_image) }}" class="rounded-circle me-3" width="60" height="60" alt="{{ user.full_name }}">
+                                    <div>
+                                        <h5 class="mb-0">{{ user.full_name }}</h5>
+                                        <p class="text-muted mb-0">صاحب مشروع</p>
+                                    </div>
+                                </div>
+                                <p class="fst-italic">"استطعنا بفضل منصة وقف الابتكار جمع التمويل اللازم لمشروعنا خلال فترة قصيرة، والآن نحن في مرحلة التنفيذ ونتطلع لتحقيق عوائد مجزية للداعمين."</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-md-4">
+                    <div class="card testimonial h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="{{ url_for('static', filename='images/default_profile.jpg') }}" class="rounded-circle me-3" width="60" height="60" alt="سارة القحطاني">
+                                <div>
+                                    <h5 class="mb-0">د. سارة القحطاني</h5>
+                                    <p class="text-muted mb-0">داعمة ومستثمرة</p>
+                                </div>
+                            </div>
+                            <p class="fst-italic">"كداعمة، أحببت شفافية المنصة وآلية متابعة المشاريع والتحقق منها، مما جعلني أثق بالمشاريع المعروضة وأساهم في تمويل ثلاثة منها حتى الآن."</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card testimonial h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="{{ url_for('static', filename='images/default_profile.jpg') }}" class="rounded-circle me-3" width="60" height="60" alt="خالد السعيد">
+                                <div>
+                                    <h5 class="mb-0">م. خالد السعيد</h5>
+                                    <p class="text-muted mb-0">مبتكر في المجال الطبي</p>
+                                </div>
+                            </div>
+                            <p class="fst-italic">"كنت قلقًا من عملية التحقق في البداية، لكن الفريق كان متعاونًا وسهّل الأمر علينا. نجحنا في جمع التمويل وبدأنا في تحقيق عوائد للداعمين قبل الموعد المتوقع!"</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5" style="background-color: var(--secondary); color: white;">
+    <div class="container text-center">
+        <h2 class="mb-3">كن جزءًا من مستقبل الابتكار</h2>
+        <p class="mb-4">ابدأ رحلتك الآن، سواء كنت مبتكرًا تبحث عن تمويل لمشروعك أو داعمًا ترغب في المساهمة في تمويل الابتكارات ذات الأثر الإيجابي</p>
+        <div class="d-flex justify-content-center flex-wrap gap-3">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">تسجيل حساب</a>
+            <a href="{{ url_for('main.projects') }}" class="btn btn-outline-light btn-lg">تصفح المشاريع</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
